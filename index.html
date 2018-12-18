@@ -1,0 +1,169 @@
+<html>
+    <head>
+        <title>Fatura Yap</title>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script>
+                var delete_button = "Sil";
+                var product_name = "Ürün Adı";
+                  
+                  //Quantity calculat
+              function quantity_calculate(item) {
+                  
+                  var quantity = $("#total_qntt_" + item).val();//Miktar
+                  var price_item = $("#price_item_" + item).val();//fiyat
+                  var discount = $("#discount_" + item).val();//indirim
+
+                  var total_tax = $("#total_tax_" + item).val();//Vergiorani
+                  
+                  //Hizmet kategorisi 1 ise hizmettir 1 oldugunda %18 vergisi ve 1000 tl uzerindeyse Tevkifat hesapla
+                  var category_id = $(".category_id_"+item).val();
+
+
+                  // Miktar(quantity) fiyat(price_item) indirim(discount) vergiOran(total_tax)
+                  //alert(quantity);
+                //Hizmet Olanlar Burda işlem yapılsın
+                if(category_id == 1){
+                    $("#total_price_"+item).addClass("categohizmettir");
+                }
+
+
+                
+              }//function quantity
+
+              
+
+                function calculateSum()
+                {
+                    var a = 0;
+                    //Total price
+                    $(".total_price").each(function () {
+                        isNaN(this.value) || 0 == this.value.length || (a += parseFloat(this.value))
+                    }),
+                    $("#total_tax_ammount").val(a.toFixed(2, 2));
+
+                    //var test = +o + +e + -f -s;
+                    //$("#geneltutar").val(test.toFixed(2, 2));
+                }
+
+                function invoice_paidamount() {
+                    var t = $("#geneltutar").val(),
+                            a = $("#odenmistutar").val(),
+                            e = t - a;
+                    $("#ktutar").val(e.toFixed(2, 2))
+                }
+
+                //Delete a row of table
+                function deleteRow(t) {
+                    var a = $("#normalinvoice > tbody > tr").length;
+                    if (1 == a)
+                        alert("There only one row you can't delete.");
+                    else {
+                        var e = t.parentNode.parentNode;
+                        e.parentNode.removeChild(e),
+                        
+                        //Tümünü toplama fonksiyonu
+                        calculateSum();
+                        //Ödenmiş Tutarı Hesaplama
+                        invoice_paidamount();
+                    }
+                }
+        </script>
+    </head>
+    <body>
+        <div style="width:1000px;height:600p;margin:0 auto;">
+            <div style="margin-top:100px;">
+                <table id="normalinvoice">
+                    <tbody>   
+                    <tr>
+                        <td>Ürünler&nbsp;&nbsp;&nbsp;&nbsp;</td><td>Miktar</td><td>Fiyat</td><td>indirim</td><td>Toplam</td><td>Sil</td>
+                    </tr>
+                    <tr>
+                        <td>Ürün1  </td>
+                        <td><input type="text" name="miktar" value="3" id="total_qntt_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
+                        <td><input type="text" name="fiyat" value="250" id="price_item_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
+                        <td><input type="text" name="indirim" id="discount_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
+                        <td><input type="text" name="toplam" class="total_price" id="total_price_1" disabled onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
+                        <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="1">Sil</button></td>
+                        <input type="hidden" name="hizmet" class="category_id_1" value="1">
+                        <input type="hidden" name="vergiorani" id="total_tax_1" value="0.18">
+                        <div class="vergisi_1 gizle"></div><div class="tevkifati_1 gizle"></div>
+                    </tr>
+                    <tr>
+                        <td>Ürün2  </td>
+                        <td><input type="text" name="miktar" value="1" id="total_qntt_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
+                        <td><input type="text" name="fiyat" value="250" id="price_item_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
+                        <td><input type="text" name="indirim" id="discount_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
+                        <td><input type="text" name="toplam" class="total_price" id="total_price_2" disabled onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
+                        <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="2">Sil</button></td>
+                        <input type="hidden" name="hizmet" class="category_id_2" value="1">
+                        <input type="hidden" name="vergiorani" id="total_tax_2" value="0.18">
+                        <div class="vergisi_2 gizle"></div><div class="tevkifati_2 gizle"></div>
+                    </tr>
+                    <tr>
+                        <td>Ürün3  </td>
+                        <td><input type="text" name="miktar" value="3" id="total_qntt_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
+                        <td><input type="text" name="fiyat" value="3000" id="price_item_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
+                        <td><input type="text" name="indirim" id="discount_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
+                        <td><input type="text" name="toplam" class="total_price" id="total_price_3" disabled onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
+                        <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="3">Sil</button></td>
+                        <input type="hidden" name="hizmet" class="category_id_3" value="0">
+                        <input type="hidden" name="vergiorani" id="total_tax_3" value="0.8">
+                        <div class="vergisi_3 gizle"></div><div class="tevkifati_3 gizle"></div>
+                    </tr>
+                </tbody>
+                
+                </table>
+
+                <table style="margin-top:50px;">
+                        <tfoot style="margin-top:200px;">
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td>Toplam</td>
+                                    <td><input type="text" id="total_tax_ammount" disabled></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td>Toplam Vergi</td>
+                                    <td><input type="text" id="toplamVergi" disabled></td>
+                                </tr>
+                                <tr>
+                                        <td colspan="3"></td>
+                                        <td>Tevkifat</td>
+                                        <td><input type="text" id="Tevkifat" disabled></td>
+                                </tr>
+                                <tr>
+                                        <td colspan="3"></td>
+                                        <td>Fatura indirimi</td>
+                                        <td><input type="text" id="faturaindirimi"></td>
+                                 </tr>    
+                            </tfoot>
+                </table>
+
+                <table style="margin-top:50px;">
+                <tfoot >
+                        <tr>
+                            <td>Genel Toplam</td>
+                            <td><input type="text" id="geneltutar" disabled></td>
+                        </tr>
+                        <tr>
+                                <td>Ödenmiş Miktar:</td>
+                                <td class="text-right">
+                                    <input type="text" id="odenmistutar" 
+                                           onkeyup="invoice_paidamount();" class="form-control text-right" name="paid_amount" placeholder="0.00"/>
+                                </td>
+                        </tr>
+                        <tr>
+                            <td>Kalan Tutar</td>
+                            <td><input type="text" id="ktutar" disabled></td>
+                        </tr>  
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        
+
+        <style>
+        .gizle{display:none;}
+        </style>
+    </body>
+</html>
