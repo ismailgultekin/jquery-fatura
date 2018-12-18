@@ -17,11 +17,6 @@
 
 
                 // Miktar(quantity) fiyat(price_item) indirim(discount) vergiOran(total_tax)
-                //Hizmet Olanlar Burda işlem yapılsın
-                if(category_id == 1){
-                    $("#total_price_"+item).addClass("categohizmettir");
-                }
-
                 var fiyat    = quantity * price_item;
                 var kdvoran  = total_tax;
                 var indirim  = discount;
@@ -33,13 +28,83 @@
                 }else{
                     var indfyt   = fiyat;
                 }
-                
                     $("#indirimlifiyat_"+item).val(indfyt);
+
                 var vergisi   = vergiVer(indfyt, kdvoran); 
                     $("#vergisi_"+item).val(vergisi);          
 
-                $("#tabsonuc").append("Tab" +item+ ": Fiyati: " + fiyat + " Indirimli Fiyati: " + indfyt + " Vergisi: " + vergisi + "<br>");
+                var tevkifati   = 0; 
+                    $("#tevkifati_"+item).val(tevkifati);    
                 
+                //Hizmet Olanlar Burda işlem yapılsın
+                if(category_id == 1){   
+                    $("#total_price_"+item).addClass("categohizmettir");
+                    $("#indirimlifiyat_"+item).addClass("categohizmet");
+                    $("#vergisi_"+item).addClass("categohizmetvergi");
+                    var hizmetkac = $(".categohizmet").length;
+	
+                    //birden fazla hizmet faturası varsa
+                    if(hizmetkac > 1){
+                        var hizmettoplam = 0;
+                        $(".categohizmet").each(function () {
+                            hizmettoplam += parseFloat($(this).val());
+                        });
+
+
+                        //Hizmetler 1000 tutarının üzerindeyse 
+			            if(hizmettoplam >= 1000){
+                            var vergitoplam = 0;
+                            $(".categohizmetvergi").each(function () {
+                                vergitoplam += parseFloat($(this).val());
+                            });
+                            //tevkifati = hizmettoplam;
+                            $(".hizmetvergitoplam").val(vergitoplam);
+                            var hizmetVergiVer = tevkifatVer(vergitoplam);
+                            $("#categohizmetvergilers").html("Hizmet Vergisi Toplamı: " +vergitoplam + " Tevkifatı: " + hizmetVergiVer);
+                            $("#Tevkifat").val(hizmetVergiVer);
+                        }else{
+                            $("#categohizmetvergilers").html("Hizmet Vergisi Toplamı: " +0 + " Tevkifatı: " + 0);
+                            $("#Tevkifat").val(0);
+                        }
+                        
+                    //Birden az hizmet varsa    
+                    }else{
+                        if(indfyt >= 1000){
+                            tevkifati = tevkifatVer(vergisi);
+                            $("#Tevkifat").val(tevkifati);
+                        }else{
+                            tevkifati = 0;
+                            $("#Tevkifat").val(tevkifati);
+                        }
+                    } 
+                }else{
+                    tevkifati = 0;
+                    $("#Tevkifat").val(tevkifati);
+                }//if(categoriy_id)
+
+                
+                
+                // vergis
+                $("#vergisi_"+item).addClass('vergis');
+                var vergislers = $(".vergis").length;
+                var vergistoplam = 0;
+                if(vergislers > 1){
+                    $(".vergis").each(function () {
+                        vergistoplam += parseFloat($(this).val());
+                    });
+                }else{
+                    vergistoplam = $("#vergisi_"+item).val();
+                }
+                
+                //var vergine = vergistoplam  - $(".hizmetvergitoplam").val();  
+                $("#toplamVergi").val(vergistoplam);
+
+                //total_price
+
+                //
+
+                $("#tab"+item).html("Fiyati: <b>" + fiyat + "</b> Indirimli Fiyati: <b>" + indfyt + "</b> Vergisi: <b>" + vergisi + "</b> Tevkifatı: <b>"+ tevkifati + "</b>");
+                calculateSum();
               }//function quantity
 
                 function indirimVer(fiyat, indirim){
@@ -61,17 +126,31 @@
                     return tevkifat;
                 }
 
-                function calculateSum()
+                function calculateSum() // total_indirimlers
                 {
-                    var a = 0;
+                    var a = 0,
+                        b = 0;
                     //Total price
                     $(".total_price").each(function () {
                         isNaN(this.value) || 0 == this.value.length || (a += parseFloat(this.value))
                     }),
-                    $("#total_tax_ammount").val(a.toFixed(2, 2));
+                    //$("#total_tax_ammount").val(a.toFixed(2, 2));
+                    $("#total_tax_ammount").val(a);
+
+                    //Total price
+                    $(".indirimlifiyatlar").each(function () {
+                        isNaN(this.value) || 0 == this.value.length || (b += parseFloat(this.value))
+                    }),
+                    //$("#total_tax_ammount").val(a.toFixed(2, 2));
+                    $("#total_indirimlers").val(b);
 
                     //var test = +o + +e + -f -s;
                     //$("#geneltutar").val(test.toFixed(2, 2));
+
+                    var c = $("#toplamVergi").val();
+
+                    var test = +b+c;
+                    $("#geneltutar").val(test);
                 }
 
                 function invoice_paidamount() {
@@ -112,7 +191,7 @@
                         <td><input type="text" name="fiyat" value="250" id="price_item_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
                         <td><input type="text" name="indirim" id="discount_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
                         <td><input type="text" name="toplam" class="total_price" id="total_price_1" disabled onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" />
-                            <input type="hidden" id="indirimlifiyat_1"><input type="hidden" id="vergisi_1"><input type="hidden" id="tevkifati_1">
+                            <input type="hidden" id="indirimlifiyat_1" class="indirimlifiyatlar" value="0"><input type="hidden" id="vergisi_1"><input type="hidden" id="tevkifati_1">
                         </td>
                         <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="1">Sil</button></td>
                         <input type="hidden" name="hizmet" class="category_id_1" value="1">
@@ -124,7 +203,7 @@
                         <td><input type="text" name="fiyat" value="250" id="price_item_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
                         <td><input type="text" name="indirim" id="discount_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
                         <td><input type="text" name="toplam" class="total_price" id="total_price_2" disabled onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" />
-                            <input type="hidden" id="indirimlifiyat_2"><input type="hidden" id="vergisi_2"><input type="hidden" id="tevkifati_2">
+                            <input type="hidden" id="indirimlifiyat_2" class="indirimlifiyatlar"  value="0"><input type="hidden" id="vergisi_2" ><input type="hidden" id="tevkifati_2">
                         </td>
                         <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="2">Sil</button></td>
                         <input type="hidden" name="hizmet" class="category_id_2" value="1">
@@ -136,7 +215,7 @@
                         <td><input type="text" name="fiyat" value="3000" id="price_item_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
                         <td><input type="text" name="indirim" id="discount_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
                         <td><input type="text" name="toplam" class="total_price" id="total_price_3" disabled onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" />
-                            <input type="hidden" id="indirimlifiyat_3"><input type="hidden" id="vergisi_3"><input type="hidden" id="tevkifati_3">
+                            <input type="hidden" id="indirimlifiyat_3" class="indirimlifiyatlar" value="0"><input type="hidden" id="vergisi_3"><input type="hidden" id="tevkifati_3">
                         </td>
                         <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="3">Sil</button></td>
                         <input type="hidden" name="hizmet" class="category_id_3" value="0">
@@ -146,19 +225,28 @@
                 
                 </table>
 
-                <div id="tabsonuc"></div>
+                <div id="tabsonuc" style="margin-top:30px;">
+                    <div id="tab1"></div>
+                    <div id="tab2"></div>
+                    <div id="tab3"></div>
+                    <div id="categohizmetvergilers"></div>
+                </div>
 
                 <table style="margin-top:50px;">
                         <tfoot style="margin-top:200px;">
                                 <tr>
                                     <td colspan="3"></td>
                                     <td>Toplam</td>
-                                    <td><input type="text" id="total_tax_ammount" disabled></td>
+                                    <td><input type="text" id="total_tax_ammount" disabled>
+                                        <input type="hidden" id="total_indirimlers">
+                                    </td>
                                 </tr>
                                 <tr>
                                     <td colspan="3"></td>
                                     <td>Toplam Vergi</td>
-                                    <td><input type="text" id="toplamVergi" disabled></td>
+                                    <td><input type="text" id="toplamVergi" disabled>
+                                        <input type="hidden" class="hizmetvergitoplam">
+                                    </td>
                                 </tr>
                                 <tr>
                                         <td colspan="3"></td>
