@@ -2,10 +2,7 @@
     <head>
         <title>Fatura Yap</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-        <script>
-                var delete_button = "Sil";
-                var product_name = "Ürün Adı";
-                  
+        <script>                  
                   //Quantity calculat
               function quantity_calculate(item) {
                   
@@ -19,18 +16,50 @@
                   var category_id = $(".category_id_"+item).val();
 
 
-                  // Miktar(quantity) fiyat(price_item) indirim(discount) vergiOran(total_tax)
-                  //alert(quantity);
+                // Miktar(quantity) fiyat(price_item) indirim(discount) vergiOran(total_tax)
                 //Hizmet Olanlar Burda işlem yapılsın
                 if(category_id == 1){
                     $("#total_price_"+item).addClass("categohizmettir");
                 }
 
+                var fiyat    = quantity * price_item;
+                var kdvoran  = total_tax;
+                var indirim  = discount;
+                
+                    $("#total_price_"+item).val(fiyat);
 
+                if((indirim != 0) || (indirim != null)){
+                    var indfyt   = indirimVer(fiyat, indirim);
+                }else{
+                    var indfyt   = fiyat;
+                }
+                
+                    $("#indirimlifiyat_"+item).val(indfyt);
+                var vergisi   = vergiVer(indfyt, kdvoran); 
+                    $("#vergisi_"+item).val(vergisi);          
+
+                $("#tabsonuc").append("Tab" +item+ ": Fiyati: " + fiyat + " Indirimli Fiyati: " + indfyt + " Vergisi: " + vergisi + "<br>");
                 
               }//function quantity
 
-              
+                function indirimVer(fiyat, indirim){
+                    var inhesap  = fiyat * indirim / 100;
+                    var indfyt   = fiyat - inhesap;
+                    
+                    return indfyt;
+                }
+                
+                function vergiVer(fiyat, oran){
+                    var vergi   = fiyat *  oran;
+                    return vergi;
+                }
+                
+                function tevkifatVer(vergi){
+                    var tevkifat  = vergi * 7 / 10;
+                    //var tevkifat = vergi - tevkbul;
+                    
+                    return tevkifat;
+                }
 
                 function calculateSum()
                 {
@@ -82,37 +111,42 @@
                         <td><input type="text" name="miktar" value="3" id="total_qntt_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
                         <td><input type="text" name="fiyat" value="250" id="price_item_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
                         <td><input type="text" name="indirim" id="discount_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
-                        <td><input type="text" name="toplam" class="total_price" id="total_price_1" disabled onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
+                        <td><input type="text" name="toplam" class="total_price" id="total_price_1" disabled onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" />
+                            <input type="hidden" id="indirimlifiyat_1"><input type="hidden" id="vergisi_1"><input type="hidden" id="tevkifati_1">
+                        </td>
                         <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="1">Sil</button></td>
                         <input type="hidden" name="hizmet" class="category_id_1" value="1">
                         <input type="hidden" name="vergiorani" id="total_tax_1" value="0.18">
-                        <div class="vergisi_1 gizle"></div><div class="tevkifati_1 gizle"></div>
                     </tr>
                     <tr>
                         <td>Ürün2  </td>
                         <td><input type="text" name="miktar" value="1" id="total_qntt_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
                         <td><input type="text" name="fiyat" value="250" id="price_item_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
                         <td><input type="text" name="indirim" id="discount_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
-                        <td><input type="text" name="toplam" class="total_price" id="total_price_2" disabled onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
+                        <td><input type="text" name="toplam" class="total_price" id="total_price_2" disabled onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" />
+                            <input type="hidden" id="indirimlifiyat_2"><input type="hidden" id="vergisi_2"><input type="hidden" id="tevkifati_2">
+                        </td>
                         <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="2">Sil</button></td>
                         <input type="hidden" name="hizmet" class="category_id_2" value="1">
                         <input type="hidden" name="vergiorani" id="total_tax_2" value="0.18">
-                        <div class="vergisi_2 gizle"></div><div class="tevkifati_2 gizle"></div>
                     </tr>
                     <tr>
                         <td>Ürün3  </td>
                         <td><input type="text" name="miktar" value="3" id="total_qntt_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
                         <td><input type="text" name="fiyat" value="3000" id="price_item_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
                         <td><input type="text" name="indirim" id="discount_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
-                        <td><input type="text" name="toplam" class="total_price" id="total_price_3" disabled onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
+                        <td><input type="text" name="toplam" class="total_price" id="total_price_3" disabled onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" />
+                            <input type="hidden" id="indirimlifiyat_3"><input type="hidden" id="vergisi_3"><input type="hidden" id="tevkifati_3">
+                        </td>
                         <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="3">Sil</button></td>
                         <input type="hidden" name="hizmet" class="category_id_3" value="0">
                         <input type="hidden" name="vergiorani" id="total_tax_3" value="0.8">
-                        <div class="vergisi_3 gizle"></div><div class="tevkifati_3 gizle"></div>
                     </tr>
                 </tbody>
                 
                 </table>
+
+                <div id="tabsonuc"></div>
 
                 <table style="margin-top:50px;">
                         <tfoot style="margin-top:200px;">
