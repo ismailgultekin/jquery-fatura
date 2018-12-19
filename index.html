@@ -1,6 +1,10 @@
-<html>
-    <head>
-        <title>Fatura Yap</title>
+<!DOCTYPE html>
+<html lang="tr">
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<meta http-equiv="Content-Language" content="tr" />
+
+        <title>Jquery Fatura Hesaplama</title>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script>                  
                   //Quantity calculat
@@ -9,30 +13,24 @@
                   var quantity = $("#total_qntt_" + item).val();//Miktar
                   var price_item = $("#price_item_" + item).val();//fiyat
                   var discount = $("#discount_" + item).val();//indirim
-
                   var total_tax = $("#total_tax_" + item).val();//Vergiorani
                   
                   //Hizmet kategorisi 1 ise hizmettir 1 oldugunda %18 vergisi ve 1000 tl uzerindeyse Tevkifat hesapla
                   var category_id = $(".category_id_"+item).val();
-
-
                 // Miktar(quantity) fiyat(price_item) indirim(discount) vergiOran(total_tax)
                 var fiyat    = quantity * price_item;
                 var kdvoran  = total_tax;
                 var indirim  = discount;
                 
                     $("#total_price_"+item).val(fiyat);
-
                 if((indirim != 0) || (indirim != null)){
                     var indfyt   = indirimVer(fiyat, indirim);
                 }else{
                     var indfyt   = fiyat;
                 }
                     $("#indirimlifiyat_"+item).val(indfyt);
-
                 var vergisi   = vergiVer(indfyt, kdvoran); 
                     $("#vergisi_"+item).val(vergisi);          
-
                 var tevkifati   = 0; 
                     $("#tevkifati_"+item).val(tevkifati);    
                 
@@ -49,8 +47,6 @@
                         $(".categohizmet").each(function () {
                             hizmettoplam += parseFloat($(this).val());
                         });
-
-
                         //Hizmetler 1000 tutarının üzerindeyse 
 			            if(hizmettoplam >= 1000){
                             var vergitoplam = 0;
@@ -71,17 +67,18 @@
                     }else{
                         if(indfyt >= 1000){
                             tevkifati = tevkifatVer(vergisi);
+							$("#tevkifati_"+item).val(tevkifati);
                             $("#Tevkifat").val(tevkifati);
                         }else{
                             tevkifati = 0;
+							$("#tevkifati_"+item).val(tevkifati);
                             $("#Tevkifat").val(tevkifati);
                         }
                     } 
                 }else{
                     tevkifati = 0;
-                    $("#Tevkifat").val(tevkifati);
+                    //$("#Tevkifat").val(tevkifati);
                 }//if(categoriy_id)
-
                 
                 
                 // vergis
@@ -98,137 +95,45 @@
                 
                 //var vergine = vergistoplam  - $(".hizmetvergitoplam").val();  
                 $("#toplamVergi").val(vergistoplam);
-
                 //total_price
-
-                //
-
-                $("#tab"+item).html("Fiyati: <b>" + fiyat + "</b> Indirimli Fiyati: <b>" + indfyt + "</b> Vergisi: <b>" + vergisi + "</b> Tevkifatı: <b>"+ tevkifati + "</b>");
-                calculateSum();
+				
+				var tabsay = $("#tab"+item).length;
+				if(tabsay < 1){ $("#tabsonuc").append("<div id='tab"+item+"'></div>"); }
+				
+                $("#tab"+item).html("Madde <b>"+item+"</b> "+"Fiyati: <b>" + fiyat + "</b> Indirimli Fiyati: <b>" + indfyt + "</b> Vergisi: <b>" + vergisi + "</b> Tevkifatı: <b>"+ tevkifati + "</b>");
+                
+				calculateSum();
               }//function quantity
-
-                function indirimVer(fiyat, indirim){
-                    var inhesap  = fiyat * indirim / 100;
-                    var indfyt   = fiyat - inhesap;
-                    
-                    return indfyt;
-                }
                 
-                function vergiVer(fiyat, oran){
-                    var vergi   = fiyat *  oran;
-                    return vergi;
-                }
-                
-                function tevkifatVer(vergi){
-                    var tevkifat  = vergi * 7 / 10;
-                    //var tevkifat = vergi - tevkbul;
-                    
-                    return tevkifat;
-                }
-
-                function calculateSum() // total_indirimlers
-                {
-                    var a = 0,
-                        b = 0;
-                    //Total price
-                    $(".total_price").each(function () {
-                        isNaN(this.value) || 0 == this.value.length || (a += parseFloat(this.value))
-                    }),
-                    //$("#total_tax_ammount").val(a.toFixed(2, 2));
-                    $("#total_tax_ammount").val(a);
-
-                    //Total price
-                    $(".indirimlifiyatlar").each(function () {
-                        isNaN(this.value) || 0 == this.value.length || (b += parseFloat(this.value))
-                    }),
-                    //$("#total_tax_ammount").val(a.toFixed(2, 2));
-                    $("#total_indirimlers").val(b);
-
-                    //var test = +o + +e + -f -s;
-                    //$("#geneltutar").val(test.toFixed(2, 2));
-
-                    var c = $("#toplamVergi").val();
-
-                    var test = +b+c;
-                    $("#geneltutar").val(test);
-                }
-
-                function invoice_paidamount() {
-                    var t = $("#geneltutar").val(),
-                            a = $("#odenmistutar").val(),
-                            e = t - a;
-                    $("#ktutar").val(e.toFixed(2, 2))
-                }
-
-                //Delete a row of table
-                function deleteRow(t) {
-                    var a = $("#normalinvoice > tbody > tr").length;
-                    if (1 == a)
-                        alert("There only one row you can't delete.");
-                    else {
-                        var e = t.parentNode.parentNode;
-                        e.parentNode.removeChild(e),
-                        
-                        //Tümünü toplama fonksiyonu
-                        calculateSum();
-                        //Ödenmiş Tutarı Hesaplama
-                        invoice_paidamount();
-                    }
-                }
         </script>
     </head>
     <body>
         <div style="width:1000px;height:600p;margin:0 auto;">
             <div style="margin-top:100px;">
                 <table id="normalinvoice">
-                    <tbody>   
-                    <tr>
-                        <td>Ürünler&nbsp;&nbsp;&nbsp;&nbsp;</td><td>Miktar</td><td>Fiyat</td><td>indirim</td><td>Toplam</td><td>Sil</td>
+				<tbody>
+					<tr>
+                        <td>Ürünler&nbsp;&nbsp;&nbsp;&nbsp;</td><td>Miktar</td><td>Fiyat</td><td>indirim</td><td>Kdv Oranı</td><td>Toplam</td><td>Sil</td>
                     </tr>
+				</tbody>
+                <tfoot>   
                     <tr>
-                        <td>Ürün1  </td>
+                        <td>Madde 1  </td>
                         <td><input type="text" name="miktar" value="3" id="total_qntt_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
                         <td><input type="text" name="fiyat" value="250" id="price_item_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
                         <td><input type="text" name="indirim" id="discount_1" onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" /></td>
-                        <td><input type="text" name="toplam" class="total_price" id="total_price_1" disabled onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" />
+                        <td><input type="text" name="vergiorani" id="total_tax_1" value="1.18"></td>
+						<td><input type="text" name="toplam" class="total_price" id="total_price_1" disabled onkeyup="quantity_calculate(1);" onchange="quantity_calculate(1);" />
                             <input type="hidden" id="indirimlifiyat_1" class="indirimlifiyatlar" value="0"><input type="hidden" id="vergisi_1"><input type="hidden" id="tevkifati_1">
                         </td>
-                        <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="1">Sil</button></td>
+                        <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this, 1)" tabindex="1">Sil</button></td>
                         <input type="hidden" name="hizmet" class="category_id_1" value="1">
-                        <input type="hidden" name="vergiorani" id="total_tax_1" value="0.18">
                     </tr>
-                    <tr>
-                        <td>Ürün2  </td>
-                        <td><input type="text" name="miktar" value="1" id="total_qntt_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
-                        <td><input type="text" name="fiyat" value="250" id="price_item_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
-                        <td><input type="text" name="indirim" id="discount_2" onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" /></td>
-                        <td><input type="text" name="toplam" class="total_price" id="total_price_2" disabled onkeyup="quantity_calculate(2);" onchange="quantity_calculate(2);" />
-                            <input type="hidden" id="indirimlifiyat_2" class="indirimlifiyatlar"  value="0"><input type="hidden" id="vergisi_2" ><input type="hidden" id="tevkifati_2">
-                        </td>
-                        <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="2">Sil</button></td>
-                        <input type="hidden" name="hizmet" class="category_id_2" value="1">
-                        <input type="hidden" name="vergiorani" id="total_tax_2" value="0.18">
-                    </tr>
-                    <tr>
-                        <td>Ürün3  </td>
-                        <td><input type="text" name="miktar" value="3" id="total_qntt_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
-                        <td><input type="text" name="fiyat" value="3000" id="price_item_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
-                        <td><input type="text" name="indirim" id="discount_3" onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" /></td>
-                        <td><input type="text" name="toplam" class="total_price" id="total_price_3" disabled onkeyup="quantity_calculate(3);" onchange="quantity_calculate(3);" />
-                            <input type="hidden" id="indirimlifiyat_3" class="indirimlifiyatlar" value="0"><input type="hidden" id="vergisi_3"><input type="hidden" id="tevkifati_3">
-                        </td>
-                        <td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this)" tabindex="3">Sil</button></td>
-                        <input type="hidden" name="hizmet" class="category_id_3" value="0">
-                        <input type="hidden" name="vergiorani" id="total_tax_3" value="0.8">
-                    </tr>
-                </tbody>
+				</tfoot>
                 
                 </table>
 
                 <div id="tabsonuc" style="margin-top:30px;">
-                    <div id="tab1"></div>
-                    <div id="tab2"></div>
-                    <div id="tab3"></div>
                     <div id="categohizmetvergilers"></div>
                 </div>
 
@@ -238,7 +143,7 @@
                                     <td colspan="3"></td>
                                     <td>Toplam</td>
                                     <td><input type="text" id="total_tax_ammount" disabled>
-                                        <input type="hidden" id="total_indirimlers">
+                                        <input type="hidden" id="total_indirimlers" value="0">
                                     </td>
                                 </tr>
                                 <tr>
@@ -277,13 +182,126 @@
                         <tr>
                             <td>Kalan Tutar</td>
                             <td><input type="text" id="ktutar" disabled></td>
-                        </tr>  
+                        </tr> 
+						<tr>
+							<td><input type="button" id="add_invoice_item" class="btn btn-info" name="add-invoice-item" onclick="addInputField('addinvoiceItem');" value="Yeni Madde Ekle" tabindex="1"/></td>
+						</tr>
                     </tfoot>
                 </table>
             </div>
         </div>
         
-
+		<script>
+				function indirimVer(fiyat, indirim){
+                    var inhesap  = fiyat * indirim / 100;
+                    var indfyt   = fiyat - inhesap;
+                    
+                    return indfyt;
+                }
+                
+                function vergiVer(fiyat, oran){
+                    var vergi   = parseInt(fiyat) *  oran;
+					var toplam  = parseInt(vergi) - parseInt(fiyat); 
+					
+					console.log(fiyat +" * " + oran + " = " + vergi + " Toplam " + toplam)
+                    return parseInt(toplam);
+                }
+                
+                function tevkifatVer(vergi){
+                    var tevkifat  = vergi * 7 / 10;
+                    //var tevkifat = vergi - tevkbul;
+                    
+                    return tevkifat;
+                }
+                
+				function calculateSum(){
+					
+					var a = 0;
+					
+                    $(".indirimlifiyatlar").each(function () {
+                        isNaN(this.value) || 0 == this.value.length || (a += parseFloat(this.value))
+                    }),
+                    $("#total_tax_ammount").val(a);
+					
+					var toplamVergi = $("#toplamVergi").val();
+					var Tevkifat = $("#Tevkifat").val();
+					
+					if((Tevkifat != "") || (Tevkifat != 0)){
+						var vergiler = toplamVergi - Tevkifat;
+					}else{
+						var vergiler = toplamVergi;
+					}
+					
+					var toplamTutar = $("#total_tax_ammount").val();
+					
+					var geneltutar = parseInt(toplamTutar) + parseInt(vergiler);
+					$("#geneltutar").val(geneltutar);
+				}
+                
+				function invoice_paidamount() {
+                    var t = $("#geneltutar").val(),
+                            a = $("#odenmistutar").val(),
+                            e = t - a;
+                    $("#ktutar").val(e.toFixed(2, 2))
+                }
+                
+				//Add Input Field Of Row
+				function addInputField(t) {
+					//alert(t);
+					var row = $("#normalinvoice tfoot tr").length;
+					var count = row + 1;
+					//alert(row);
+					var a  = '<tr>';
+                    var b = '<td>Madde '+count+'  </td>';
+                    var c = '<td><input type="text" name="miktar" value="0" id="total_qntt_'+count+'" onkeyup="quantity_calculate('+count+');" onchange="quantity_calculate('+count+');" /></td>';
+                    var d = '<td><input type="text" name="fiyat" value="0" id="price_item_'+count+'" onkeyup="quantity_calculate('+count+');" onchange="quantity_calculate('+count+');" /></td>';
+                    var f = '<td><input type="text" name="indirim" id="discount_'+count+'" onkeyup="quantity_calculate('+count+');" onchange="quantity_calculate('+count+');" /></td>';
+                    var n = '<td><input type="text" name="vergiorani" id="total_tax_'+count+'" value="1.08"></td>';
+					var g = '<td><input type="text" name="toplam" class="total_price" id="total_price_'+count+'" disabled onkeyup="quantity_calculate('+count+');" onchange="quantity_calculate('+count+');" />';
+                    var h = '<input type="hidden" id="indirimlifiyat_'+count+'" class="indirimlifiyatlar" value="0"><input type="hidden" id="vergisi_'+count+'"><input type="hidden" id="tevkifati_'+count+'">';
+                    var k = '</td>';
+                    var l = '<td><button style="text-align: right;" class="btn btn-danger" type="button" value="Sil" onclick="deleteRow(this, '+count+')" tabindex="'+count+'">Sil</button></td>';
+                    var m = '<input type="hidden" name="hizmet" class="category_id_'+count+'" value="0">';
+					var	o = '</tr>';
+					//var gos = a + b + c + d;
+					$("#normalinvoice tfoot").append(a + b + c + d + f + n + g + h + k + l + m + o);
+					//alert(gos);
+					count++
+				}
+				//Delete a row of table
+                function deleteRow(t, item) {					
+                    var a = $("#normalinvoice > tfoot > tr").length;
+                    if (1 == a)
+                        alert("Faturada en az 1 tane olması gerekıyor.");
+                    else {
+                        //Tekrar Hesaplat
+							//tekrarHesapla(item);
+						
+						var toplamVergi = $("#toplamVergi").val();
+						if(toplamVergi > 0){
+							var total_tax_ammount = $("#total_tax_ammount").val();
+							var category_id_ne = $(".category_id_"+item).val();
+								//Hizmet Olanlar Burda işlem yapılsın
+								if(category_id_ne == 1){ }else{ }
+								var indirimlifiyat = $("#indirimlifiyat_"+item).val();
+								var vergisi		   = $("#vergisi_"+item).val();
+								var tevkifati	   = $("#tevkifati_"+item).val();
+							
+								$("#total_tax_ammount").val(total_tax_ammount - indirimlifiyat);
+								$("#toplamVergi").val(toplamVergi - vergisi);
+								$("#tab"+item).remove();
+						}
+						
+						var e = t.parentNode.parentNode;
+                        e.parentNode.removeChild(e),
+                        
+                        //Tümünü toplama fonksiyonu
+                        calculateSum();
+                        //Ödenmiş Tutarı Hesaplama
+                        invoice_paidamount();
+                    }
+                }
+		</script>
         <style>
         .gizle{display:none;}
         </style>
